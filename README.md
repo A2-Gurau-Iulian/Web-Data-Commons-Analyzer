@@ -162,11 +162,12 @@ To run this project, you will need to add the following environment variables to
 <!-- Prerequisites -->
 ### Prerequisites
 
-This project uses Yarn as package manager
+This project uses Node(for React) and python
 
-```bash
-
-```
+  <ul>
+    <li>For Node first install NVM : https://github.com/coreybutler/nvm-windows then run ```nvm install lts``` to install lts version and then ```nvm use lts``` to start using it.</li>
+    <li>Python can be downloaded here : https://www.python.org/downloads/</li>
+  </ul>
 
 <!-- Installation -->
 ### Installation

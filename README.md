@@ -125,7 +125,9 @@ Maybe you can mention me or this repo in the acknowledgements too
 
 <!-- Docs -->
 ### Docs
-- [https://docs.google.com/document/d/1K1OkfUDWL1zcNSBpkhGmLcoCbaOIK5pYqQVOgikIo9k/edit?usp=sharing](Service Oriented Architecture)
+  <ul>
+    <li><a href="https://docs.google.com/document/d/1K1OkfUDWL1zcNSBpkhGmLcoCbaOIK5pYqQVOgikIo9k/edit?usp=sharing">Service Oriented Architecture</a></li>
+  </ul>
 
 <!-- Features -->
 ### Features
@@ -272,11 +274,9 @@ function App() {
 <!-- Roadmap -->
 ## Roadmap
 
-<details>
   <ul>
     <li><a href="https://trello.com/b/PW6cOfPp/web">Trello Board</a></li>
   </ul>
-</details>
 
 
 <!-- License -->

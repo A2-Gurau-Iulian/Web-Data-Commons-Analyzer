@@ -1,4 +1,2 @@
-*.pyc
-.mypy_cache
-.cache
-.venv
+__pycache__/
+*.py[cod]

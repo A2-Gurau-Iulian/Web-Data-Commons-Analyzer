@@ -10,7 +10,7 @@ Maybe you can mention me or this repo in the acknowledgements too
 
 
   <img src="assets/logo.png" alt="logo" width="200" height="auto" />
-  <h1>Awesome Readme Template</h1>
+  <h1>Web-Data-Commons-Analyzer</h1>
   
   <p>
     An awesome README template for your projects! 
@@ -93,25 +93,19 @@ Maybe you can mention me or this repo in the acknowledgements too
 ### Tech Stack
 
 <details>
-  <summary>Client</summary>
+  <summary>Frontend</summary>
   <ul>
     <li><a href="https://www.typescriptlang.org/">Typescript</a></li>
-    <li><a href="https://nextjs.org/">Next.js</a></li>
     <li><a href="https://reactjs.org/">React.js</a></li>
-    <li><a href="https://tailwindcss.com/">TailwindCSS</a></li>
   </ul>
 </details>
 
 <details>
-  <summary>Server</summary>
+  <summary>Backend</summary>
   <ul>
-    <li><a href="https://www.typescriptlang.org/">Typescript</a></li>
-    <li><a href="https://expressjs.com/">Express.js</a></li>
-    <li><a href="https://go.dev/">Golang</a></li>
-    <li><a href="https://nestjs.com/">Nest.js</a></li>
-    <li><a href="https://socket.io/">SocketIO</a></li>
-    <li><a href="https://www.prisma.io/">Prisma</a></li>    
-    <li><a href="https://www.apollographql.com/">Apollo</a></li>
+    <li><a href="https://www.python.org/">Python</a></li>
+    <li><a href="https://fastapi.tiangolo.com/">FastAPI</a></li>
+    <li><a href="https://docs.astral.sh/uv/">UV</a></li>
     <li><a href="https://graphql.org/">GraphQL</a></li>
   </ul>
 </details>
@@ -119,20 +113,14 @@ Maybe you can mention me or this repo in the acknowledgements too
 <details>
 <summary>Database</summary>
   <ul>
-    <li><a href="https://www.mysql.com/">MySQL</a></li>
     <li><a href="https://www.postgresql.org/">PostgreSQL</a></li>
-    <li><a href="https://redis.io/">Redis</a></li>
-    <li><a href="https://neo4j.com/">Neo4j</a></li>
-    <li><a href="https://www.mongodb.com/">MongoDB</a></li>
   </ul>
 </details>
 
 <details>
 <summary>DevOps</summary>
   <ul>
-    <li><a href="https://www.docker.com/">Docker</a></li>
-    <li><a href="https://www.jenkins.io/">Jenkins</a></li>
-    <li><a href="https://circleci.com/">CircleCLI</a></li>
+    <li><a href="https://www.docker.com/">TBD PROBABIL DOCKER</a></li>
   </ul>
 </details>
 
@@ -159,9 +147,9 @@ Maybe you can mention me or this repo in the acknowledgements too
 
 To run this project, you will need to add the following environment variables to your .env file
 
-`API_KEY`
+`TBD KEY`
 
-`ANOTHER_API_KEY`
+`TBD ANOTHER KEY`
 
 <!-- Getting Started -->
 ## Getting Started
@@ -191,7 +179,7 @@ Install my-project with npm
 To run tests, run the following command
 
 ```bash
-  yarn test test
+  TBD
 ```
 
 <!-- Run Locally -->
@@ -251,36 +239,6 @@ function App() {
 
 * [x] Todo 1
 * [ ] Todo 2
-
-
-<!-- Contributing -->
-## Contributing
-
-<a href="https://github.com/Louis3797/awesome-readme-template/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Louis3797/awesome-readme-template" />
-</a>
-
-
-Contributions are always welcome!
-
-See `contributing.md` for ways to get started.
-
-
-<!-- Code of Conduct -->
-### Code of Conduct
-
-Please read the [Code of Conduct](https://github.com/Louis3797/awesome-readme-template/blob/master/CODE_OF_CONDUCT.md)
-
-<!-- FAQ -->
-## FAQ
-
-- Question 1
-
-  + Answer 1
-
-- Question 2
-
-  + Answer 2
 
 
 <!-- License -->

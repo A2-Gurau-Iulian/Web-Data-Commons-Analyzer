@@ -105,8 +105,7 @@ Maybe you can mention me or this repo in the acknowledgements too
   <ul>
     <li><a href="https://www.python.org/">Python</a></li>
     <li><a href="https://fastapi.tiangolo.com/">FastAPI</a></li>
-    <li><a href="https://docs.astral.sh/uv/">UV</a></li>
-    <li><a href="https://graphql.org/">GraphQL</a></li>
+    <li><a href="https://pypi.org/">PIP</a></li>
   </ul>
 </details>
 
@@ -124,12 +123,16 @@ Maybe you can mention me or this repo in the acknowledgements too
   </ul>
 </details>
 
+<!-- Docs -->
+### Docs
+- [https://docs.google.com/document/d/1K1OkfUDWL1zcNSBpkhGmLcoCbaOIK5pYqQVOgikIo9k/edit?usp=sharing](Service Oriented Architecture)
+
 <!-- Features -->
 ### Features
 
-- Feature 1
-- Feature 2
-- Feature 3
+- TBD
+- TBD
+- TBD
 
 <!-- Color Reference -->
 ### Color Reference
@@ -160,7 +163,7 @@ To run this project, you will need to add the following environment variables to
 This project uses Yarn as package manager
 
 ```bash
- npm install --global yarn
+
 ```
 
 <!-- Installation -->
@@ -169,8 +172,7 @@ This project uses Yarn as package manager
 Install my-project with npm
 
 ```bash
-  yarn install my-project
-  cd my-project
+TBD
 ```
    
 <!-- Running Tests -->
@@ -182,8 +184,8 @@ To run tests, run the following command
   TBD
 ```
 
-<!-- Run Locally -->
-### Run Locally
+<!-- Development -->
+### Development
 
 Clone the project
 
@@ -194,21 +196,54 @@ Clone the project
 Go to the project directory
 
 ```bash
-  cd my-project
+  cd web-data-commons-analyzer
+```
+
+Frontend
+
+Go into the frontend directory
+
+```bash
+  cd frontend
 ```
 
 Install dependencies
 
 ```bash
-  yarn install
+  npm install
 ```
 
-Start the server
+Run the development server
 
 ```bash
-  yarn start
+  npm start
 ```
 
+Backend
+
+In the main directory of the project (web-data-commons-analyzer) create a virtual environment
+
+```bash
+  python3 -m venv venv
+```
+
+Activate the virtual environment
+
+```bash
+  venv\Scripts\activate
+```
+
+Install dependencies 
+
+```bash
+  pip install -r backend/requirements.txt
+```
+
+Run the server 
+
+```bash
+  fastapi dev backend/src/main.py
+```
 
 <!-- Deployment -->
 ### Deployment
@@ -216,7 +251,7 @@ Start the server
 To deploy this project run
 
 ```bash
-  yarn deploy
+  TBD
 ```
 
 
@@ -227,18 +262,21 @@ Use this space to tell a little more about your project and how it can be used. 
 
 
 ```javascript
-import Component from 'my-project'
+import TBD from 'TBD'
 
 function App() {
-  return <Component />
+  return <TBD />
 }
 ```
 
 <!-- Roadmap -->
 ## Roadmap
 
-* [x] Todo 1
-* [ ] Todo 2
+<details>
+  <ul>
+    <li><a href="https://trello.com/b/PW6cOfPp/web">Trello Board</a></li>
+  </ul>
+</details>
 
 
 <!-- License -->
@@ -248,11 +286,13 @@ Distributed under the no License. See LICENSE.txt for more information.
 
 
 <!-- Contact -->
-## Contact
+## Team - JustWeb
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
+Gurău Iulian - MSD1
 
-Project Link: [https://github.com/Louis3797/awesome-readme-template](https://github.com/Louis3797/awesome-readme-template)
+Sîrghi Constantin-Florin - MSD1
+
+Project Link: [https://github.com/A2-Gurau-Iulian/Web-Data-Commons-Analyzer](https://github.com/A2-Gurau-Iulian/Web-Data-Commons-Analyzer)
 
 
 <!-- Acknowledgments -->

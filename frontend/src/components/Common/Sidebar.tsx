@@ -11,12 +11,41 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 
 const drawerWidth = 240;
+
+const items = [
+  {
+    text: "Home",
+    subItems: [
+      { text: "Dashboard", route: "/home/dashboard" },
+      { text: "Profile", route: "/home/profile" },
+    ],
+  },
+  {
+    text: "Visualize",
+    subItems: [
+      { text: "Records", route: "/visualize/records" },
+      { text: "Graphs", route: "/visualize/graphs" },
+      { text: "Charts", route: "/visualize/charts" },
+    ],
+  },
+  {
+    text: "Classify",
+    subItems: [
+      { text: "Category A", route: "/classify/category-a" },
+      { text: "Category B", route: "/classify/category-b" },
+    ],
+  },
+  {
+    text: "Match",
+    subItems: [
+      { text: "Match 1", route: "/match/match-1" },
+      { text: "Match 2", route: "/match/match-2" },
+    ],
+  },
+];
 
 export default function Sidebar() {
   return (
@@ -26,7 +55,6 @@ export default function Sidebar() {
         position="fixed"
         sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
       >
-        {" "}
         <Toolbar />
       </AppBar>
       <Drawer
@@ -48,15 +76,24 @@ export default function Sidebar() {
         </Toolbar>
         <Divider />
         <List>
-          {["Home", "Visualize", "Classify", "Match"].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton component={Link} to={`/${text.toLowerCase()}`}>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
+          {items.map(({ text, subItems }) => (
+            <React.Fragment key={text}>
+              <ListItem>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: "bold", pl: 2 }}
+                >
+                  {text}
+                </Typography>
+              </ListItem>
+              {subItems.map(({ text: subText, route: subRoute }) => (
+                <ListItem key={subText} disablePadding sx={{ pl: 4 }}>
+                  <ListItemButton component={Link} to={subRoute}>
+                    <ListItemText primary={subText} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </React.Fragment>
           ))}
         </List>
       </Drawer>

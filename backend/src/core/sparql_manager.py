@@ -6,7 +6,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Fuseki SPARQL endpoints
-QUERY_ENDPOINT = "http://localhost:3030/test/query"
+QUERY_ENDPOINT = "http://localhost:3030/airport/query"
 UPDATE_ENDPOINT = "http://localhost:3030/dataset/update"
 
 def execute_select_query(sparql_query):

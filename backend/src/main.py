@@ -1,6 +1,7 @@
 from core.sparql_manager import execute_select_query
-from api.visualize import select_categories
-from fastapi import FastAPI, HTTPException
+from api.charts import select_categories
+from api.records import select_records
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -17,9 +18,15 @@ app.add_middleware(
 def read_root():
     return {"Hello": "World"}
 
-@app.get("/visualize")
+@app.get("/visualize/charts")
 def read_object_count():
     return select_categories()
+
+@app.get("/visualize/records")
+def read_object_count(
+    limit: int = Query(10, ge=1, le=100, description="Number of records per page"),
+    offset: int = Query(0, ge=0, description="Offset for pagination"),):
+    return select_records(limit=limit, offset=offset)
 
 @app.get("/sparql/select")
 async def sparql_select(query: str):

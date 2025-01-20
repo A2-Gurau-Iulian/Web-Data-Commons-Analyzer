@@ -13,9 +13,10 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as LayoutImport } from './routes/_layout'
 import { Route as LayoutIndexImport } from './routes/_layout/index'
-import { Route as LayoutClassifyImport } from './routes/_layout/classify'
 import { Route as LayoutVisualizeRecordsImport } from './routes/_layout/visualize/records'
 import { Route as LayoutVisualizeChartsImport } from './routes/_layout/visualize/charts'
+import { Route as LayoutClassifyClassifyImport } from './routes/_layout/classify/classify'
+import { Route as LayoutClassifyCategoryDetailsImport } from './routes/_layout/classify/categoryDetails'
 
 // Create/Update Routes
 
@@ -27,12 +28,6 @@ const LayoutRoute = LayoutImport.update({
 const LayoutIndexRoute = LayoutIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => LayoutRoute,
-} as any)
-
-const LayoutClassifyRoute = LayoutClassifyImport.update({
-  id: '/classify',
-  path: '/classify',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -48,6 +43,19 @@ const LayoutVisualizeChartsRoute = LayoutVisualizeChartsImport.update({
   getParentRoute: () => LayoutRoute,
 } as any)
 
+const LayoutClassifyClassifyRoute = LayoutClassifyClassifyImport.update({
+  id: '/classify/classify',
+  path: '/classify/classify',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
+const LayoutClassifyCategoryDetailsRoute =
+  LayoutClassifyCategoryDetailsImport.update({
+    id: '/classify/categoryDetails',
+    path: '/classify/categoryDetails',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -59,18 +67,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutImport
       parentRoute: typeof rootRoute
     }
-    '/_layout/classify': {
-      id: '/_layout/classify'
-      path: '/classify'
-      fullPath: '/classify'
-      preLoaderRoute: typeof LayoutClassifyImport
-      parentRoute: typeof LayoutImport
-    }
     '/_layout/': {
       id: '/_layout/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof LayoutIndexImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/classify/categoryDetails': {
+      id: '/_layout/classify/categoryDetails'
+      path: '/classify/categoryDetails'
+      fullPath: '/classify/categoryDetails'
+      preLoaderRoute: typeof LayoutClassifyCategoryDetailsImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/classify/classify': {
+      id: '/_layout/classify/classify'
+      path: '/classify/classify'
+      fullPath: '/classify/classify'
+      preLoaderRoute: typeof LayoutClassifyClassifyImport
       parentRoute: typeof LayoutImport
     }
     '/_layout/visualize/charts': {
@@ -93,15 +108,17 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface LayoutRouteChildren {
-  LayoutClassifyRoute: typeof LayoutClassifyRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
+  LayoutClassifyCategoryDetailsRoute: typeof LayoutClassifyCategoryDetailsRoute
+  LayoutClassifyClassifyRoute: typeof LayoutClassifyClassifyRoute
   LayoutVisualizeChartsRoute: typeof LayoutVisualizeChartsRoute
   LayoutVisualizeRecordsRoute: typeof LayoutVisualizeRecordsRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
-  LayoutClassifyRoute: LayoutClassifyRoute,
   LayoutIndexRoute: LayoutIndexRoute,
+  LayoutClassifyCategoryDetailsRoute: LayoutClassifyCategoryDetailsRoute,
+  LayoutClassifyClassifyRoute: LayoutClassifyClassifyRoute,
   LayoutVisualizeChartsRoute: LayoutVisualizeChartsRoute,
   LayoutVisualizeRecordsRoute: LayoutVisualizeRecordsRoute,
 }
@@ -111,15 +128,17 @@ const LayoutRouteWithChildren =
 
 export interface FileRoutesByFullPath {
   '': typeof LayoutRouteWithChildren
-  '/classify': typeof LayoutClassifyRoute
   '/': typeof LayoutIndexRoute
+  '/classify/categoryDetails': typeof LayoutClassifyCategoryDetailsRoute
+  '/classify/classify': typeof LayoutClassifyClassifyRoute
   '/visualize/charts': typeof LayoutVisualizeChartsRoute
   '/visualize/records': typeof LayoutVisualizeRecordsRoute
 }
 
 export interface FileRoutesByTo {
-  '/classify': typeof LayoutClassifyRoute
   '/': typeof LayoutIndexRoute
+  '/classify/categoryDetails': typeof LayoutClassifyCategoryDetailsRoute
+  '/classify/classify': typeof LayoutClassifyClassifyRoute
   '/visualize/charts': typeof LayoutVisualizeChartsRoute
   '/visualize/records': typeof LayoutVisualizeRecordsRoute
 }
@@ -127,22 +146,35 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_layout': typeof LayoutRouteWithChildren
-  '/_layout/classify': typeof LayoutClassifyRoute
   '/_layout/': typeof LayoutIndexRoute
+  '/_layout/classify/categoryDetails': typeof LayoutClassifyCategoryDetailsRoute
+  '/_layout/classify/classify': typeof LayoutClassifyClassifyRoute
   '/_layout/visualize/charts': typeof LayoutVisualizeChartsRoute
   '/_layout/visualize/records': typeof LayoutVisualizeRecordsRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/classify' | '/' | '/visualize/charts' | '/visualize/records'
+  fullPaths:
+    | ''
+    | '/'
+    | '/classify/categoryDetails'
+    | '/classify/classify'
+    | '/visualize/charts'
+    | '/visualize/records'
   fileRoutesByTo: FileRoutesByTo
-  to: '/classify' | '/' | '/visualize/charts' | '/visualize/records'
+  to:
+    | '/'
+    | '/classify/categoryDetails'
+    | '/classify/classify'
+    | '/visualize/charts'
+    | '/visualize/records'
   id:
     | '__root__'
     | '/_layout'
-    | '/_layout/classify'
     | '/_layout/'
+    | '/_layout/classify/categoryDetails'
+    | '/_layout/classify/classify'
     | '/_layout/visualize/charts'
     | '/_layout/visualize/records'
   fileRoutesById: FileRoutesById
@@ -172,18 +204,23 @@ export const routeTree = rootRoute
     "/_layout": {
       "filePath": "_layout.tsx",
       "children": [
-        "/_layout/classify",
         "/_layout/",
+        "/_layout/classify/categoryDetails",
+        "/_layout/classify/classify",
         "/_layout/visualize/charts",
         "/_layout/visualize/records"
       ]
     },
-    "/_layout/classify": {
-      "filePath": "_layout/classify.tsx",
-      "parent": "/_layout"
-    },
     "/_layout/": {
       "filePath": "_layout/index.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/classify/categoryDetails": {
+      "filePath": "_layout/classify/categoryDetails.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/classify/classify": {
+      "filePath": "_layout/classify/classify.tsx",
       "parent": "/_layout"
     },
     "/_layout/visualize/charts": {

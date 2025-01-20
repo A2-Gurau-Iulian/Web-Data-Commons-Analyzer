@@ -34,6 +34,7 @@ const items = [
   {
     text: "Classify",
     subItems: [
+      { text: "Category", route: "/classify/classify" },
       { text: "Category A", route: "/classify/category-a" },
       { text: "Category B", route: "/classify/category-b" },
     ],

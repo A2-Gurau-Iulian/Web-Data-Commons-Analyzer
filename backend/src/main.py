@@ -39,3 +39,29 @@ async def sparql_select(query: str):
         return results["results"]["bindings"]  # Simplify the response to only include bindings
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/category/sparql")
+async def sparql_select(category: str, query: str, ):
+    category = category.lower()
+    sparql_query = f"""
+    PREFIX a: <http://example.org/>
+
+    SELECT ?name (STRAFTER(STR(?subject), "{category}/") AS ?id)
+    WHERE {{
+    ?subject a:name ?name.
+    FILTER(STRSTARTS(STR(?name), "{query}"))
+    }}
+    LIMIT 10
+    """
+    results = execute_select_query(sparql_query, f"http://localhost:3030/{category}/query")
+    bindings = results.get("results", {}).get("bindings", [])
+
+    refined = [
+            {
+                "name": item["name"]["value"],
+                "id": item["id"]["value"]
+            }
+            for item in bindings
+        ]
+
+    return {"results": refined}

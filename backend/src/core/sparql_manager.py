@@ -9,12 +9,14 @@ logger = logging.getLogger(__name__)
 QUERY_ENDPOINT = "http://localhost:3030/airport/query"
 UPDATE_ENDPOINT = "http://localhost:3030/dataset/update"
 
-def execute_select_query(sparql_query):
+def execute_select_query(sparql_query, endpoint=None):
+    local_enpoint = endpoint if endpoint is not None else QUERY_ENDPOINT
+
     """
     Execute a SPARQL SELECT query and return the results.
     """
     headers = {"Accept": "application/sparql-results+json"}
-    response = requests.get(QUERY_ENDPOINT, params={"query": sparql_query}, headers=headers)
+    response = requests.get(local_enpoint, params={"query": sparql_query}, headers=headers)
     if response.status_code == 200:
         logger.info("Query executed successfully.")
         return response.json()
@@ -33,3 +35,6 @@ def execute_update_query(sparql_update):
     else:
         logger.error(f"Failed to execute update query: {response.text}")
         raise Exception("Error executing SPARQL UPDATE query")
+
+
+

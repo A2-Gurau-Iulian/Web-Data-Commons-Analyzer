@@ -49,7 +49,7 @@ async def sparql_select(category: str, query: str, ):
     SELECT ?name (STRAFTER(STR(?subject), "{category}/") AS ?id)
     WHERE {{
     ?subject a:name ?name.
-    FILTER(STRSTARTS(STR(?name), "{query}"))
+    FILTER(STRSTARTS(LCASE(STR(?name)), "{query}"))
     }}
     LIMIT 10
     """

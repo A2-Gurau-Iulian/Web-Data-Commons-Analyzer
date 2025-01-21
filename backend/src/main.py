@@ -8,7 +8,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Allow requests from your frontend
+    allow_origins=["http://127.0.0.1:5173"],  # Allow requests from your frontend
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
@@ -42,7 +42,7 @@ async def sparql_select(query: str):
 
 @app.get("/category/sparql")
 async def sparql_select(category: str, query: str, ):
-    category = category.lower()
+    category = category.replace(" ", "").lower()
     sparql_query = f"""
     PREFIX a: <http://example.org/>
 

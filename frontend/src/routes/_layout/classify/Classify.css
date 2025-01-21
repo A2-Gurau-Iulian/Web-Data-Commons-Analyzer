@@ -1,0 +1,34 @@
+.gridContainer {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+    gap: 8px;
+    height: 100vh;
+    width: 100vw;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+  
+  .box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-blend-mode: overlay;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .box:hover {
+    transform: scale(1.1); /* Slightly grow the box */
+    background-color: transparent; /* Remove overlay */
+  }

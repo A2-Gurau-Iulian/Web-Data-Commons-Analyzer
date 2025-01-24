@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createFileRoute, useLocation } from '@tanstack/react-router';
-import SearchBar from './SearchBar';
-import ResultsContainer from './ResultsContainer';
-import RightContainer from './RightContainer';
+import SearchBar from '@/components/Classify/SearchBar';
+import ResultsContainer from '@/components/Classify/ResultsContainer';
+import RightContainer from '@/components/Classify/RightContainer';
 
 // Route definition
 export const Route = createFileRoute('/_layout/classify/categoryDetails')({
@@ -13,6 +13,7 @@ function CategoryDetails() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const category = params.get('category');
+  const backgroundImage = params.get('backgroundImage');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState([]);
@@ -67,7 +68,7 @@ function CategoryDetails() {
       </div>
 
       {/* Right container */}
-      <RightContainer category={category} selectedItemId={selectedItemId} />
+      <RightContainer category={category} selectedItemId={selectedItemId} backgroundImage={backgroundImage}/>
     </div>
   );
 }
@@ -77,14 +78,16 @@ const styles = {
     width: '100%',
     display: 'flex', // Use flexbox to align items side by side
     padding: '20px',
-    border: '5px solid rgb(255, 0, 0)',
+    // border: '5px solid rgb(255, 0, 0)',
     height: '800px', // Adjust height as needed
   },
   leftContainer: {
+    display: 'flex', // Use flexbox to align items side by side
+    flexDirection: 'column', /* Stack children vertically */
     flex: 0.3, // Takes up remaining space
     marginRight: '20px', // Adds space between left and right container
-    border: '5px solid rgb(39, 71, 114)',
-    maxHeight: '800px', // Adjust height as needed
+    // border: '5px solid rgb(39, 71, 114)',
+    maxHeight: '100%', // Adjust height as needed
   },
 };
 

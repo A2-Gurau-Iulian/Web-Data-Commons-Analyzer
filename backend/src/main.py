@@ -63,13 +63,21 @@ async def sparql_select(query: str):
 async def sparql_select(category: str, query: str, ):
     query = query.lower()
     category = category.replace(" ", "").lower()
+
+    if category == "creativework":
+        main_header = "headline"
+    elif category == "jobposting":
+        main_header = "title"
+    else:
+        main_header = "name"
+
     sparql_query = f"""
     PREFIX a: <http://example.org/>
 
     SELECT ?name (STRAFTER(STR(?subject), "{category}/") AS ?id)
     WHERE {{
-    ?subject a:name ?name.
-    FILTER(STRSTARTS(LCASE(STR(?name)), "{query}"))
+    ?subject a:{main_header} ?name.
+    FILTER(CONTAINS(LCASE(STR(?name)), "{query}"))
     }}
     LIMIT 10
     """

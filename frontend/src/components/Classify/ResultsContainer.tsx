@@ -33,12 +33,12 @@ function ResultsContainer({ results, loading, onSelect }) {
 const styles = {
   resultsContainer: {
     width: '100%',
-    maxHeight: '600px', // Adjust height as needed
     overflowY: 'auto',  // Enables vertical scrolling when content overflows
     marginTop: '20px',
-    border: '5px solid rgb(235, 0, 223)',
+    // border: '5px solid rgb(235, 0, 223)',
     padding: '10px',
     borderRadius: '5px',
+    maxHeight: '100%'
   },
   resultItem: {
     padding: '10px',

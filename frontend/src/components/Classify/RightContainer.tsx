@@ -3,13 +3,16 @@ import React, { useEffect, useState } from 'react';
 interface RightContainerProps {
   category: string;
   selectedItemId: string | null; // Nullable, as no item may be selected initially
+  backgroundImage: string;
 }
-
-const RightContainer: React.FC<RightContainerProps> = ({ category, selectedItemId }) => {
+    
+const RightContainer: React.FC<RightContainerProps> = ({ category, selectedItemId, backgroundImage }) => {
   const [additionalInfo, setAdditionalInfo] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
-
+  const images_root = "../../public/assets/images/"
+  const image_background = images_root + backgroundImage;
+  
   // Fetch additional info whenever `selectedItemId` changes
   useEffect(() => {
     if (selectedItemId != null) {
@@ -111,21 +114,29 @@ const RightContainer: React.FC<RightContainerProps> = ({ category, selectedItemI
                   </div>
                 ))}
     
-              {/* Other Information Section */}
-              <h2>Other Information</h2>
-              <button onClick={toggleCollapse} style={styles.collapseButton}>
-                {isCollapsed ? 'Expand' : 'Collapse'}
-              </button>
-              {!isCollapsed && (
-                <div style={styles.collapsedContent}>
-                  {additionalInfo
-                    .filter((info) => info.attribute === 'other_info') // Only include "other_info"
-                    .map((info, index) => (
-                      <div key={index} style={styles.infoItem}>
-                        {renderValue(info.value)}
-                      </div>
-                    ))}
-                </div>
+                  {additionalInfo.some(
+                (info) =>
+                  info.attribute === 'other_info' &&
+                  info.value &&
+                  Object.keys(info.value).length > 0 // Ensure it's not empty
+              ) && (
+                <>
+                  <h2>Other Information</h2>
+                  <button onClick={toggleCollapse} style={styles.collapseButton}>
+                    {isCollapsed ? 'Expand' : 'Collapse'}
+                  </button>
+                  {!isCollapsed && (
+                    <div style={styles.collapsedContent}>
+                      {additionalInfo
+                        .filter((info) => info.attribute === 'other_info')
+                        .map((info, index) => (
+                          <div key={index} style={styles.infoItem}>
+                            {renderValue(info.value)}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </>
               )}
             </>
           ) : (
@@ -140,6 +151,7 @@ const styles = {
         flex: 0.7, // Adjust width of right container
         // height: '500px',
         padding: '20px',
+        paddingRight: '50px',
         border: '1px solid #ddd',
         borderRadius: '5px',
         backgroundColor: '#f9f9f9',
@@ -147,15 +159,19 @@ const styles = {
         overflowY: 'auto',  // Enables vertical scrolling when content overflows
         },
     infoItem: {
+        // border: '5px solid rgb(255, 0, 0)',
         marginBottom: '12px',
+        // width: '95%'
         },
     jsonObject: {
+        // border: '5px solid rgb(142, 250, 0)',
         marginLeft: '16px',
         backgroundColor: '#f0f0f0',
         padding: '8px',
         borderRadius: '4px',
         },
     jsonEntry: {
+        // border: '5px solid rgb(55, 0, 255)',
         marginBottom: '4px',
         },
     collapseButton: {

@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 interface RightContainerProps {
   category: string;
   selectedItemId: string | null; // Nullable, as no item may be selected initially
+  addToCompare,
   backgroundImage: string;
 }
     
-const RightContainer: React.FC<RightContainerProps> = ({ category, selectedItemId, backgroundImage }) => {
+const RightContainer: React.FC<RightContainerProps> = ({ category, selectedItemId, addToCompare, backgroundImage }) => {
   const [additionalInfo, setAdditionalInfo] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -104,17 +105,26 @@ const RightContainer: React.FC<RightContainerProps> = ({ category, selectedItemI
             <p>Loading additional info...</p>
           ) : additionalInfo.length > 0 ? (
             <>
+              {/* General Add to Compare Button */}
+              <button
+                onClick={() => addToCompare(additionalInfo)}
+                style={styles.someButton}
+              >
+                Add to Compare
+              </button>
+
               {/* Information Section */}
               <h2>Information</h2>
               {additionalInfo
-                .filter((info) => info.attribute !== 'other_info') // Exclude "other_info" here
+                .filter((info) => info.attribute !== 'other_info') // Exclude "other_info"
                 .map((info, index) => (
                   <div key={index} style={styles.infoItem}>
                     <strong>{info.attribute}:</strong> {renderValue(info.value)}
                   </div>
                 ))}
-    
-                  {additionalInfo.some(
+
+              {/* Other Information Section */}
+              {additionalInfo.some(
                 (info) =>
                   info.attribute === 'other_info' &&
                   info.value &&
@@ -122,7 +132,7 @@ const RightContainer: React.FC<RightContainerProps> = ({ category, selectedItemI
               ) && (
                 <>
                   <h2>Other Information</h2>
-                  <button onClick={toggleCollapse} style={styles.collapseButton}>
+                  <button onClick={toggleCollapse} style={styles.someButton}>
                     {isCollapsed ? 'Expand' : 'Collapse'}
                   </button>
                   {!isCollapsed && (
@@ -174,7 +184,7 @@ const styles = {
         // border: '5px solid rgb(55, 0, 255)',
         marginBottom: '4px',
         },
-    collapseButton: {
+    someButton: {
         margin: '1rem 0',
         padding: '0.5rem 1rem',
         background: '#007bff',

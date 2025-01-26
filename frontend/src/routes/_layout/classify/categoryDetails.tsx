@@ -3,6 +3,8 @@ import { createFileRoute, useLocation } from '@tanstack/react-router';
 import SearchBar from '@/components/Classify/SearchBar';
 import ResultsContainer from '@/components/Classify/ResultsContainer';
 import RightContainer from '@/components/Classify/RightContainer';
+import BottomRightPopup from '@/components/Classify/ComparePopup';
+import ComparisonTable from '@/components/Classify/ComparisonTable';
 
 // Route definition
 export const Route = createFileRoute('/_layout/classify/categoryDetails')({
@@ -18,6 +20,8 @@ function CategoryDetails() {
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [compareList, setCompareList] = useState([]);
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
 
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null); // Track selected item
 
@@ -49,6 +53,28 @@ function CategoryDetails() {
     setLoading(false);
   };
 
+  const addToCompare = (info) => {
+    // Prevent duplicate additions
+    const exists = compareList.some(
+      (item) => JSON.stringify(item) === JSON.stringify(info)
+    );
+    
+    if (compareList.length < 5 && !exists) {
+      setCompareList([...compareList, info]);
+    }
+  };
+
+  const removeFromCompare = (index: number) => {
+    setCompareList((prevList) => prevList.filter((_, i) => i !== index));
+  };
+
+  const handleCompare = () => {
+    // For now, just log the compare list. You can replace this with logic to show the full-page comparison modal.
+    // console.log('Comparing these items:', compareList);
+    // alert('Comparison view coming soon!');
+    setIsComparisonOpen(true);
+  };
+
   return (
     <div style={styles.container}>
       {/* Left container */}
@@ -68,7 +94,22 @@ function CategoryDetails() {
       </div>
 
       {/* Right container */}
-      <RightContainer category={category} selectedItemId={selectedItemId} backgroundImage={backgroundImage}/>
+      <RightContainer category={category} selectedItemId={selectedItemId} addToCompare={addToCompare} backgroundImage={backgroundImage}/>
+
+      {/* Bottom Right Popup */}
+      <BottomRightPopup
+        compareList={compareList}
+        removeFromCompare={removeFromCompare}
+        onCompare={handleCompare}
+      />
+
+      {isComparisonOpen && (
+        <ComparisonTable
+          compareList={compareList}
+          onClose={() => setIsComparisonOpen(false)}
+        />
+      )}
+      
     </div>
   );
 }

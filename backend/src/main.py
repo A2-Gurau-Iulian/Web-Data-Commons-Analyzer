@@ -116,8 +116,11 @@ async def sparql_select(category: str, id: str):
         json_value = item["object"]["value"]
         
         if '{' in json_value:
+            # Remove the extra escaping and convert to a dictionary
+            corrected_string = json_value.replace(r'\\', r'')  # Remove extra backslashes
+
             # Convert the string to a Python dictionary
-            data = ast.literal_eval(json_value)
+            data = ast.literal_eval(corrected_string)
 
             # Recursively deserialize all JSON-like strings
             result = deserialize_recursive(data)
@@ -134,5 +137,18 @@ async def sparql_select(category: str, id: str):
         refined += aux_value,
     
     refined += other_info,
+
+
+    if category == "creativework":
+        main_header = "headline"
+    elif category == "jobposting":
+        main_header = "title"
+    else:
+        main_header = "name"
+
+    for item in refined:
+        if item["attribute"] == main_header:
+            item["attribute"] = "name"
+            break
 
     return {"results": refined}

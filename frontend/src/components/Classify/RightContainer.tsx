@@ -107,7 +107,7 @@ const RightContainer: React.FC<RightContainerProps> = ({ category, selectedItemI
             <>
               {/* General Add to Compare Button */}
               <button
-                onClick={() => addToCompare(additionalInfo)}
+                onClick={() => addToCompare(additionalInfo, category)}
                 style={styles.someButton}
               >
                 Add to Compare

@@ -23,7 +23,26 @@ function CategoryDetails() {
   const [compareList, setCompareList] = useState([]);
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
 
+  const [compareLists, setCompareLists] = useState({});
+
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null); // Track selected item
+
+  // Load compareList from localStorage when the component mounts
+  useEffect(() => {
+    const savedCompareList = localStorage.getItem('compareList');
+    if (savedCompareList) {
+      const local_storage = JSON.parse(savedCompareList);
+      if (Object.keys(local_storage).length > 0){
+        console.log("iulian")
+        setCompareLists(JSON.parse(savedCompareList));
+      }
+    }
+  }, []);
+
+  // Save compareList to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('compareList', JSON.stringify(compareLists));
+  }, [compareLists]);
 
   // Debounce logic for search
   useEffect(() => {
@@ -53,26 +72,30 @@ function CategoryDetails() {
     setLoading(false);
   };
 
-  const addToCompare = (info) => {
-    // Prevent duplicate additions
-    const exists = compareList.some(
-      (item) => JSON.stringify(item) === JSON.stringify(info)
-    );
-    
-    if (compareList.length < 5 && !exists) {
-      setCompareList([...compareList, info]);
-    }
+  const addToCompare = (info, category) => {
+    setCompareLists((prevLists) => {
+      const currentList = prevLists[category] || []; // Get the current list for the category or initialize as empty
+  
+      // Prevent duplicate additions
+      const exists = currentList.some(
+        (item) => JSON.stringify(item) === JSON.stringify(info)
+      );
+  
+      if (currentList.length < 5 && !exists) {
+        return {
+          ...prevLists,
+          [category]: [...currentList, info], // Add the new item to the specific category
+        };
+      }
+  
+      return prevLists; // If no change, return the previous state
+    });
   };
 
-  const removeFromCompare = (index: number) => {
-    setCompareList((prevList) => prevList.filter((_, i) => i !== index));
-  };
-
-  const handleCompare = () => {
-    // For now, just log the compare list. You can replace this with logic to show the full-page comparison modal.
-    // console.log('Comparing these items:', compareList);
-    // alert('Comparison view coming soon!');
-    setIsComparisonOpen(true);
+  const handleCompare = (category, list) => {
+    console.log(`Comparing items for category: ${category}`, list);
+    // Logic to display the comparison popup for the specific category
+    // setIsComparisonOpen(true);
   };
 
   return (
@@ -97,11 +120,23 @@ function CategoryDetails() {
       <RightContainer category={category} selectedItemId={selectedItemId} addToCompare={addToCompare} backgroundImage={backgroundImage}/>
 
       {/* Bottom Right Popup */}
-      <BottomRightPopup
-        compareList={compareList}
-        removeFromCompare={removeFromCompare}
-        onCompare={handleCompare}
-      />
+      <div style={styles.Popup}>
+        {Object.entries(compareLists).map(([category, list]) => (
+          <BottomRightPopup
+            key={category}
+            compareList={list}
+            removeFromCompare={(itemIndex) => {
+              setCompareLists((prevLists) => {
+                const updatedList = [...prevLists[category]];
+                updatedList.splice(itemIndex, 1); // Remove the item by index
+                return { ...prevLists, [category]: updatedList };
+              });
+            }}
+            onCompare={() => handleCompare(category, list)}
+            category={category}
+          />
+        ))}
+      </div>
 
       {isComparisonOpen && (
         <ComparisonTable
@@ -115,6 +150,15 @@ function CategoryDetails() {
 }
 
 const styles = {
+  Popup:{
+    // border: '5px solid rgb(255, 0, 0)',
+    display: 'flex', 
+    justifyContent: 'space-around', 
+    position: 'fixed', 
+    bottom: '10px', 
+    right: '10px',
+    alignItems: 'flex-end'
+  },
   container: {
     width: '100%',
     display: 'flex', // Use flexbox to align items side by side

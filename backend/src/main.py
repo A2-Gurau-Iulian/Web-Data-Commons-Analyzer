@@ -143,8 +143,18 @@ async def sparql_select(category: str, id: str, main: bool):
             # Remove the extra escaping and convert to a dictionary
             corrected_string = json_value.replace(r'\\', r'')  # Remove extra backslashes
 
-            # Convert the string to a Python dictionary
-            data = ast.literal_eval(corrected_string)
+            try:
+                # Convert the string to a Python dictionary
+                data = ast.literal_eval(corrected_string)
+            except SyntaxError as e:
+                print(f"SyntaxError: {e}")
+                aux_value["value"] = f"SyntaxError: {e}"
+                if aux_value["attribute"] == "other_info":
+                    other_info["attribute"] = aux_value["attribute"]
+                    other_info["value"] = aux_value["value"]
+                    continue
+                refined += aux_value,
+                continue
 
             # Recursively deserialize all JSON-like strings
             result = deserialize_recursive(data)

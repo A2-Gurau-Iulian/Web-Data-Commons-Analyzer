@@ -133,6 +133,7 @@ function CategoryDetails() {
       // console.log(idList);
     } catch (error) {
       console.error('Error fetching IDs:', error);
+      setIdList([]);
     }
     setIsLoadingIds(false);
   };

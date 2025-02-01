@@ -5,7 +5,26 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 import json
 import ast
+import os
+import re
 
+DATA_PATH = os.path.join(os.getcwd(), "backend\src\data.json")
+with open(DATA_PATH, "r") as file:
+    DATA = json.load(file)
+    COUNTRIES = DATA["countries"]
+    PAIRS = DATA["pairs"]
+
+CURRENT_COUNTRY = None
+
+def get_current_country(values):
+    for country in COUNTRIES:
+        for value in values:
+            pattern = r'\b' + country + r'\b'
+            if re.search(pattern, value, re.IGNORECASE):
+                return country
+    return None
+
+        
 def deserialize_recursive(data):
     # If the data is a string and looks like JSON, parse it
     if isinstance(data, str):
@@ -94,7 +113,8 @@ async def sparql_select(category: str, query: str, ):
     return {"results": refined}
 
 @app.get("/item_by_id/sparql")
-async def sparql_select(category: str, id: str):
+async def sparql_select(category: str, id: str, main: bool):
+    global CURRENT_COUNTRY
     category = category.replace(" ", "").lower()
     sparql_query = f"""
     SELECT (STRAFTER(STR(?predicate), "http://example.org/") AS ?property) ?object
@@ -103,15 +123,19 @@ async def sparql_select(category: str, id: str):
     FILTER(?subject = <http://example.org/{category}/{id}>)
     }}
     """
-    print(category)
     results = execute_select_query(sparql_query, f"http://localhost:3030/{category}/query")
     bindings = results.get("results", {}).get("bindings", [])
 
     refined = []
     other_info = {}
+    collected_values = []
     for item in bindings:
         aux_value = {}
         aux_value["attribute"] = item["property"]["value"]
+
+        # collect the values to determin the current country
+        if item["property"]["value"] in PAIRS[category]:
+            collected_values += item["object"]["value"],
 
         json_value = item["object"]["value"]
         
@@ -136,8 +160,15 @@ async def sparql_select(category: str, id: str):
         
         refined += aux_value,
     
+    # Update the current country only if the category is from search bar
+    if main:
+        CURRENT_COUNTRY = get_current_country(collected_values)
+
+    refined += {"attribute": "CURRENT_COUNTRY", "value": CURRENT_COUNTRY},
+
     refined += other_info,
 
+    
 
     if category == "creativework":
         main_header = "headline"
@@ -152,3 +183,40 @@ async def sparql_select(category: str, id: str):
             break
 
     return {"results": refined}
+
+
+@app.get("/similarities/sparql")
+async def sparql_select(category: str):
+    category = category.replace(" ", "").lower()
+    if CURRENT_COUNTRY is None:
+        return {"ids": []}
+    
+    ids_list = []
+    attributes = PAIRS[category]
+
+    search_in = ""
+    for attribute in attributes:
+        search_in = search_in + f"ex:{attribute},"
+    search_in = search_in[:-1]
+    sparql_query = f"""
+    PREFIX ex: <http://example.org/>
+    SELECT DISTINCT  
+        (STRAFTER(STR(?predicate), "example.org/") AS ?attr)
+        (STRAFTER(STR(?subject), "{category}/") AS ?id)
+    WHERE {{
+        ?subject ?predicate ?object .
+        FILTER(?predicate IN ({search_in}) && REGEX(LCASE(STR(?object)), "\\\\b{CURRENT_COUNTRY}\\\\b", "i"))
+    }}
+    LIMIT 10
+    """
+    results = execute_select_query(sparql_query, f"http://localhost:3030/{category}/query")
+    bindings = results.get("results", {}).get("bindings", [])
+    item_list = []
+    for item in bindings:
+        # aux_value = {}
+        # aux_value["id"] = item["id"]["value"]
+        # aux_value["attr"] = item["attr"]["value"]
+        # aux_value["value"] = item["object"]["value"]
+        item_list += item["id"]["value"],
+
+    return {"ids": item_list}

@@ -6,6 +6,15 @@ import RightContainer from '@/components/Classify/RightContainer';
 import BottomRightPopup from '@/components/Classify/ComparePopup';
 import ComparisonTable from '@/components/Classify/ComparisonTable';
 
+const categories = [
+  "Administrative Area", "Airport", "Book", "City", "College or University", "Country", "Creative Work", "Data Set", 
+  "Educational Organization", "Event", "Geo Coordinates", "Government Organization", "Hospital", "Hotel", "Job Posting", "Lake Body of Water", 
+  "Landmarks or Historical Buildings", "Language", "Library", "Local Business", "Mountain", "Movie", "Museum", 
+  "Music Album", "Music Recording", "Painting", "Park", "Place", "Product", "Question", 
+  "Radio Station", "Recipe", "Restaurant", "River Body of Water", "School", "Shopping Center", "Ski Resort", 
+  "Sports Event", "Sports Team", "Stadium or Arena", "Television Station", "TV Episode"
+];
+
 // Route definition
 export const Route = createFileRoute('/_layout/classify/categoryDetails')({
   component: CategoryDetails,
@@ -24,8 +33,14 @@ function CategoryDetails() {
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
 
   const [compareLists, setCompareLists] = useState({});
-
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null); // Track selected item
+  const [isMainCategory, setIsMainCategory] = useState(false);
+  const [tableCategory, setTableCategory] = useState('');
+  
+  // States for "Similarities based on country"
+  const [selectedCategory, setSelectedCategory] = useState(category);
+  const [idList, setIdList] = useState<string[]>([]);
+  const [isLoadingIds, setIsLoadingIds] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   // Load compareList from localStorage when the component mounts
   useEffect(() => {
@@ -33,7 +48,6 @@ function CategoryDetails() {
     if (savedCompareList) {
       const local_storage = JSON.parse(savedCompareList);
       if (Object.keys(local_storage).length > 0){
-        console.log("iulian")
         setCompareLists(JSON.parse(savedCompareList));
       }
     }
@@ -41,11 +55,15 @@ function CategoryDetails() {
 
   // Save compareList to localStorage whenever it changes
   useEffect(() => {
+    setCompareList(compareLists[category]);
     localStorage.setItem('compareList', JSON.stringify(compareLists));
   }, [compareLists]);
 
   // Debounce logic for search
   useEffect(() => {
+    setSelectedCategory(category);
+    setIsMainCategory(true);
+    console.log("search bar", category, true);
     const delayDebounceFn = setTimeout(() => {
       if (searchTerm.length > 0) {
         fetchResults(searchTerm);
@@ -61,7 +79,7 @@ function CategoryDetails() {
   const fetchResults = async (query: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/category/sparql?category=${category}&query=${query}`);
+      const response = await fetch(`http://127.0.0.1:8000/category/sparql?category=${selectedCategory}&query=${query}`);
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       setResults(data.results || []); // Default to an empty array
@@ -95,7 +113,28 @@ function CategoryDetails() {
   const handleCompare = (category, list) => {
     console.log(`Comparing items for category: ${category}`, list);
     // Logic to display the comparison popup for the specific category
-    // setIsComparisonOpen(true);
+    console.log(compareLists[category]);
+    setCompareList(compareLists[category]);
+    setTableCategory(category);
+    setIsComparisonOpen(true);
+  };
+
+  const handleCategoryChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCategory = e.target.value;
+    setSelectedCategory(selectedCategory);
+    setIsMainCategory(false);
+    console.log("select bar", selectedCategory, false);
+    // Call the API when a category is selected
+    setIsLoadingIds(true);
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/similarities/sparql?category=${selectedCategory}`);
+      const data = await response.json();
+      setIdList(data.ids); // Assuming the API returns an object with an 'ids' array
+      // console.log(idList);
+    } catch (error) {
+      console.error('Error fetching IDs:', error);
+    }
+    setIsLoadingIds(false);
   };
 
   return (
@@ -112,12 +151,16 @@ function CategoryDetails() {
         <ResultsContainer
           results={results}
           loading={loading}
-          onSelect={(id: string) => setSelectedItemId(id)} // Pass selected item ID
+          onSelect={(id: string) => {setSelectedItemId(id); // Pass selected item ID
+            if(id != null){
+              setIsMainCategory(true); setSelectedCategory(category); setIdList([]); console.log("results container", true, category, []);}
+            }
+          } 
         />
       </div>
 
       {/* Right container */}
-      <RightContainer category={category} selectedItemId={selectedItemId} addToCompare={addToCompare} backgroundImage={backgroundImage}/>
+      <RightContainer category={selectedCategory} selectedItemId={selectedItemId} addToCompare={addToCompare} backgroundImage={backgroundImage} isMainCategory={isMainCategory} />
 
       {/* Bottom Right Popup */}
       <div style={styles.Popup}>
@@ -141,38 +184,83 @@ function CategoryDetails() {
       {isComparisonOpen && (
         <ComparisonTable
           compareList={compareList}
+          tableCategory = {tableCategory}
           onClose={() => setIsComparisonOpen(false)}
         />
       )}
       
+      {/* Similarities based on country section */}
+      <div style={styles.similaritiesContainer}>
+        <h3>Similarities based on country</h3>
+        
+        {/* Select category */}
+        <select value={selectedCategory} onChange={handleCategoryChange} style={styles.select}>
+          <option value="">Select a category</option>
+          {categories.map((cat, index) => (
+            <option key={index} value={cat}>{cat}</option>
+          ))}
+        </select>
+
+        {/* Display the IDs */}
+        {isLoadingIds ? (
+          <p>Fetching similar items...</p> // Custom loading message
+        ) : idList.length === 0 ? (
+          <p>No similarities found.</p> // Message when the list is empty
+        ) : (
+          <ul>
+            {idList.map((id) => (
+              <li key={id} onClick={() => {setSelectedItemId(id); setIsMainCategory(false); setSelectedCategory(selectedCategory);}} style={styles.idItem}>
+                {id}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
 
 const styles = {
-  Popup:{
-    // border: '5px solid rgb(255, 0, 0)',
-    display: 'flex', 
-    justifyContent: 'space-around', 
-    position: 'fixed', 
-    bottom: '10px', 
+  Popup: {
+    display: 'flex',
+    justifyContent: 'space-around',
+    position: 'fixed',
+    bottom: '10px',
     right: '10px',
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
+    zIndex: 1000
   },
   container: {
     width: '100%',
-    display: 'flex', // Use flexbox to align items side by side
+    display: 'flex',
     padding: '20px',
-    // border: '5px solid rgb(255, 0, 0)',
-    height: '800px', // Adjust height as needed
+    height: '800px',
   },
   leftContainer: {
-    display: 'flex', // Use flexbox to align items side by side
-    flexDirection: 'column', /* Stack children vertically */
-    flex: 0.3, // Takes up remaining space
-    marginRight: '20px', // Adds space between left and right container
-    // border: '5px solid rgb(39, 71, 114)',
-    maxHeight: '100%', // Adjust height as needed
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 0.3,
+    marginRight: '20px',
+    maxHeight: '100%',
+  },
+  similaritiesContainer: {
+    marginTop: '20px',
+    padding: '20px',
+    backgroundColor: '#f8f8f8',
+    borderRadius: '8px',
+    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+  },
+  select: {
+    padding: '10px',
+    marginBottom: '10px',
+    width: '100%',
+    borderRadius: '5px',
+    border: '1px solid #ccc',
+  },
+  idItem: {
+    cursor: 'pointer',
+    padding: '5px 0',
+    borderBottom: '1px solid #eee',
   },
 };
 

@@ -5,9 +5,10 @@ interface RightContainerProps {
   selectedItemId: string | null; // Nullable, as no item may be selected initially
   addToCompare,
   backgroundImage: string;
+  isMainCategory;
 }
     
-const RightContainer: React.FC<RightContainerProps> = ({ category, selectedItemId, addToCompare, backgroundImage }) => {
+const RightContainer: React.FC<RightContainerProps> = ({ category, selectedItemId, addToCompare, backgroundImage, isMainCategory }) => {
   const [additionalInfo, setAdditionalInfo] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -27,7 +28,7 @@ const RightContainer: React.FC<RightContainerProps> = ({ category, selectedItemI
     const fetchAdditionalInfo = async (id: string) => {
     setLoading(true);
     try {
-        const response = await fetch(`http://127.0.0.1:8000/item_by_id/sparql?category=${category}&id=${id}`);
+        const response = await fetch(`http://127.0.0.1:8000/item_by_id/sparql?category=${category}&id=${id}&main=${isMainCategory}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         setAdditionalInfo(data.results || []); // Default to an empty array

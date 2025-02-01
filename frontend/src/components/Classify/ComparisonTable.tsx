@@ -2,10 +2,11 @@ import React from 'react';
 
 interface ComparisonTableProps {
   compareList: Array<{ attribute: string; value: any }[]>;
+  tableCategory;
   onClose: () => void; // Function to close the popup
 }
 
-const ComparisonTable: React.FC<ComparisonTableProps> = ({ compareList, onClose }) => {
+const ComparisonTable: React.FC<ComparisonTableProps> = ({ compareList, tableCategory, onClose }) => {
   if (compareList.length === 0) {
     onClose();
   }
@@ -77,7 +78,7 @@ return <span>{value}</span>;
       <button onClick={onClose} style={styles.closeButton}>
         Close
       </button>
-      <h2>Comparison Table</h2>
+      <h2>{tableCategory} Comparison Table</h2>
       <table style={styles.table}>
         <thead>
           <tr>
@@ -121,7 +122,7 @@ const styles = {
     padding: '10px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
     overflowY: 'auto',
-    height: '400px',
+    height: '600px',
     zIndex: 999
   },
   table: {

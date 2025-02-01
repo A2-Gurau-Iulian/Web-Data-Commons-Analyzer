@@ -62,7 +62,6 @@ const BottomRightPopup = ({
 const styles = {
   popupContainer: {
     // border: '5px solid rgb(0, 17, 255)',
-    zIndex: 1000,
     // position: 'relative',
     margin: '5px',
     padding: '10px',

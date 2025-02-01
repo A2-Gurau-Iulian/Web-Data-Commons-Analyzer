@@ -5,5 +5,5 @@ export const Route = createFileRoute('/_layout/')({
 })
 
 function Home() {
-  return <div>Hello "/_layout/home"!</div>
+  return <div>Web data common analyzer is a web app for visualizing and analyzing web data</div>
 }

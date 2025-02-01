@@ -1,8 +1,11 @@
 from core.sparql_manager import execute_select_query
-from api.charts import select_categories
+from api.charts import select_chart_data
 from api.records import select_records
+from api.graphs import select_initial_graph
+from api.graphs import select_high_impact_nodes
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import json
 import ast
 import os
@@ -56,15 +59,58 @@ app.add_middleware(
 def read_root():
     return {"Hello": "World"}
 
+from fastapi import Query
+
+from fastapi import Query
+
 @app.get("/visualize/charts")
-def read_object_count():
-    return select_categories()
+def read_chart_data(
+    what: str = Query("Count of", description="What data to retrieve"),
+    by: str = Query("Predicate", description="Group data by Predicate, Subject, or Object"),
+    datasets: list = Query(None, description="List of datasets to query")
+):
+    """
+    Dynamic endpoint to retrieve chart data based on user selection and datasets.
+    """
+    if not datasets:
+        print("aa", datasets)
+        raise HTTPException(status_code=400, detail="No datasets selected.")
+    
+    print("bb", datasets)
+    
+    return select_chart_data(what=what, by=by, datasets=datasets)
+
 
 @app.get("/visualize/records")
-def read_object_count(
+def read_records(
     limit: int = Query(10, ge=1, le=100, description="Number of records per page"),
-    offset: int = Query(0, ge=0, description="Offset for pagination"),):
-    return select_records(limit=limit, offset=offset)
+    offset: int = Query(0, ge=0, description="Offset for pagination"),
+    sortBy: str = Query("subject", regex="^(subject|predicate|object)$", description="Field to sort by"),
+    sortDirection: str = Query("asc", regex="^(asc|desc)$", description="Sort direction (asc or desc)"),
+    subjectFilter: str = Query(None, description="Filter for subject (contains match)"),
+    predicateFilter: str = Query(None, description="Filter for predicate (contains match)"),
+    objectFilter: str = Query(None, description="Filter for object (contains match)"),
+    datasets: list = Query(None, description="List of datasets to query (e.g., ['airport', 'city'])")
+):
+    """
+    API endpoint to fetch paginated, sorted, and filtered RDF triples across selected datasets.
+    """
+    if not datasets:
+        print("aa", datasets)
+        raise HTTPException(status_code=400, detail="No datasets selected.")
+    
+    print("bb", datasets)
+
+    return select_records(
+        limit=limit,
+        offset=offset,
+        sortBy=sortBy,
+        sortDirection=sortDirection,
+        subjectFilter=subjectFilter,
+        predicateFilter=predicateFilter,
+        objectFilter=objectFilter,
+        datasets=datasets
+    )
 
 @app.get("/sparql/select")
 async def sparql_select(query: str):
@@ -77,6 +123,178 @@ async def sparql_select(query: str):
         return results["results"]["bindings"]  # Simplify the response to only include bindings
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/datasets")
+def get_available_datasets():
+    """
+    Return the list of available datasets.
+    """
+    datasets = [
+        "administrativearea",
+        "airport",
+        "book",
+        "city",
+        "collegeoruniversity",
+        "country",
+        "creativework",
+        "dataset",
+        "educationalorganization",
+
+    ]
+    return {"datasets": datasets}
+
+@app.get("/visualize/graph")
+def get_initial_graph(
+    datasets: list = Query(..., description="List of datasets to include"),
+    search: str = Query(None, description="Keyword search to filter nodes or links"),
+    limit: int = Query(500, ge=1, le=10000, description="Number of triples to fetch"),
+):
+    """
+    Fetch the initial RDF graph for visualization, with optional keyword search.
+    """
+    try:
+        if not datasets:
+            raise HTTPException(status_code=400, detail="At least one dataset must be specified.")
+
+        # Fetch top subjects or apply keyword search
+        top_subjects = select_high_impact_nodes(datasets=datasets, limit=limit, search=search)
+
+        # Fetch triples for these subjects and datasets
+        graph = select_initial_graph(top_subjects, datasets=datasets, limit=limit, search=search)
+        return graph
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/visualize/records/export", response_class=JSONResponse)
+def export_triples_jsonld(
+    datasets: list = Query(..., description="List of datasets to include"),
+    sortBy: str = Query("subject", regex="^(subject|predicate|object)$", description="Field to sort by"),
+    sortDirection: str = Query("asc", regex="^(asc|desc)$", description="Sort direction (asc or desc)"),
+    subjectFilter: str = Query(None, description="Filter for subject (contains match)"),
+    predicateFilter: str = Query(None, description="Filter for predicate (contains match)"),
+    objectFilter: str = Query(None, description="Filter for object (contains match)")
+):
+    """
+    Fetch all filtered and sorted RDF triples and return them in JSON-LD format.
+    """
+    sort_field_mapping = {
+        "subject": "?subject",
+        "predicate": "?predicate",
+        "object": "?object"
+    }
+    sort_field = sort_field_mapping.get(sortBy, "?subject")
+    order_by = "ASC" if sortDirection == "asc" else "DESC"
+
+    # Build filters
+    filters = []
+    if subjectFilter:
+        filters.append(f"FILTER(CONTAINS(LCASE(STR(?subject)), LCASE(\"{subjectFilter}\")))")
+    if predicateFilter:
+        filters.append(f"FILTER(CONTAINS(LCASE(STR(?predicate)), LCASE(\"{predicateFilter}\")))")
+    if objectFilter:
+        filters.append(f"FILTER(CONTAINS(LCASE(STR(?object)), LCASE(\"{objectFilter}\")))")
+
+    filters_clause = "\n".join(filters)
+
+    # SPARQL Query to fetch all matching triples (without pagination)
+    query = f"""
+    SELECT ?subject ?predicate ?object
+    WHERE {{
+      ?subject ?predicate ?object
+      {filters_clause}
+    }}
+    ORDER BY {order_by}({sort_field})
+    """
+    
+    # Execute query
+    results = execute_select_query(query, datasets)
+    
+    jsonld_context = {
+        "@context": {
+            "subject": "@id",
+            "predicate": "@type",
+            "object": "@value"
+        }
+    }
+    
+    jsonld_data = []
+    for result in results:
+        bindings = result.get("results", {}).get("bindings", [])
+        for binding in bindings:
+            jsonld_data.append({
+                "subject": binding["subject"]["value"],
+                "predicate": binding["predicate"]["value"],
+                "object": binding["object"]["value"]
+            })
+
+    # Return JSON-LD response
+    return JSONResponse(content={**jsonld_context, "@graph": jsonld_data})
+
+from fastapi.responses import Response
+
+@app.get("/visualize/records/export/rdf", response_class=Response)
+def export_triples_rdf(
+    datasets: list = Query(..., description="List of datasets to include"),
+    sortBy: str = Query("subject", regex="^(subject|predicate|object)$", description="Field to sort by"),
+    sortDirection: str = Query("asc", regex="^(asc|desc)$", description="Sort direction (asc or desc)"),
+    subjectFilter: str = Query(None, description="Filter for subject (contains match)"),
+    predicateFilter: str = Query(None, description="Filter for predicate (contains match)"),
+    objectFilter: str = Query(None, description="Filter for object (contains match)")
+):
+    """
+    Fetch all filtered and sorted RDF triples and return them in Turtle (RDF) format.
+    """
+    sort_field_mapping = {
+        "subject": "?subject",
+        "predicate": "?predicate",
+        "object": "?object"
+    }
+    sort_field = sort_field_mapping.get(sortBy, "?subject")
+    order_by = "ASC" if sortDirection == "asc" else "DESC"
+
+    # Build filters
+    filters = []
+    if subjectFilter:
+        filters.append(f"FILTER(CONTAINS(LCASE(STR(?subject)), LCASE(\"{subjectFilter}\")))")
+    if predicateFilter:
+        filters.append(f"FILTER(CONTAINS(LCASE(STR(?predicate)), LCASE(\"{predicateFilter}\")))")
+    if objectFilter:
+        filters.append(f"FILTER(CONTAINS(LCASE(STR(?object)), LCASE(\"{objectFilter}\")))")
+
+    filters_clause = "\n".join(filters)
+
+    # SPARQL Query to fetch all matching triples (without pagination)
+    query = f"""
+    SELECT ?subject ?predicate ?object
+    WHERE {{
+      ?subject ?predicate ?object
+      {filters_clause}
+    }}
+    ORDER BY {order_by}({sort_field})
+    """
+    
+    # Execute query
+    results = execute_select_query(query, datasets)
+
+    # Convert results to RDF Turtle format
+    turtle_data = ""
+    for result in results:
+        bindings = result.get("results", {}).get("bindings", [])
+        for binding in bindings:
+            subject = f"<{binding['subject']['value']}>"
+            predicate = f"<{binding['predicate']['value']}>"
+            obj = binding["object"]["value"]
+            
+            # If object is a URI, wrap it in <>, otherwise wrap in ""
+            if obj.startswith("http://") or obj.startswith("https://"):
+                obj = f"<{obj}>"
+            else:
+                obj = f'"{obj}"'
+
+            # Append to Turtle data
+            turtle_data += f"{subject} {predicate} {obj} .\n"
+
+    return Response(content=turtle_data, media_type="text/turtle")
 
 @app.get("/category/sparql")
 async def sparql_select(category: str, query: str, ):

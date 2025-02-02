@@ -1,28 +1,43 @@
 import requests
 import logging
 
+AVAILABE_DATASETS = [
+    "administrativearea",
+    "airport",
+    "book",
+    "city",
+    "collegeoruniversity",
+    "country",
+]
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Fuseki SPARQL endpoints
-QUERY_ENDPOINT = "http://localhost:3030/airport/query"
+QUERY_ENDPOINT = "http://localhost:3030/{dataset}/query"
 UPDATE_ENDPOINT = "http://localhost:3030/dataset/update"
 
-def execute_select_query(sparql_query, endpoint=None):
-    local_enpoint = endpoint if endpoint is not None else QUERY_ENDPOINT
-
+def select_from_dataset(sparql_query, dataset):
     """
     Execute a SPARQL SELECT query and return the results.
     """
     headers = {"Accept": "application/sparql-results+json"}
-    response = requests.get(local_enpoint, params={"query": sparql_query}, headers=headers)
+
+    response = requests.get(QUERY_ENDPOINT.format(dataset=dataset), params={"query": sparql_query}, headers=headers)
     if response.status_code == 200:
         logger.info("Query executed successfully.")
         return response.json()
     else:
         logger.error(f"Failed to execute query: {response.text}")
         raise Exception("Error executing SPARQL SELECT query")
+
+def execute_select_query(sparql_query, datasets = AVAILABE_DATASETS):
+    results = []
+    for dataset in datasets:
+        data = select_from_dataset(sparql_query=sparql_query, dataset=dataset)
+        results.append(data)
+    return results
 
 def execute_update_query(sparql_update):
     """

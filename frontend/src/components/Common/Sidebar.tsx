@@ -37,15 +37,6 @@ const items = [
     text: "Classify",
     subItems: [
       { text: "Category", route: "/classify/classify" },
-      { text: "Category A", route: "/classify/category-a" },
-      { text: "Category B", route: "/classify/category-b" },
-    ],
-  },
-  {
-    text: "Match",
-    subItems: [
-      { text: "Match 1", route: "/match/match-1" },
-      { text: "Match 2", route: "/match/match-2" },
     ],
   },
 ];

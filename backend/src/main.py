@@ -1,3 +1,4 @@
+from core.sparql_manager import select_from_dataset
 from core.sparql_manager import execute_select_query
 from api.charts import select_chart_data
 from api.records import select_records
@@ -49,7 +50,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5173"],  # Allow requests from your frontend
+    allow_origins=["http://localhost:5173"],  # Allow requests from your frontend
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
@@ -318,7 +319,7 @@ async def sparql_select(category: str, query: str, ):
     }}
     LIMIT 10
     """
-    results = execute_select_query(sparql_query, f"http://localhost:3030/{category}/query")
+    results = select_from_dataset(sparql_query, category)
     bindings = results.get("results", {}).get("bindings", [])
     refined = [
             {
@@ -341,7 +342,7 @@ async def sparql_select(category: str, id: str, main: bool):
     FILTER(?subject = <http://example.org/{category}/{id}>)
     }}
     """
-    results = execute_select_query(sparql_query, f"http://localhost:3030/{category}/query")
+    results = select_from_dataset(sparql_query, category)
     bindings = results.get("results", {}).get("bindings", [])
 
     refined = []
@@ -437,7 +438,7 @@ async def sparql_select(category: str):
     }}
     LIMIT 10
     """
-    results = execute_select_query(sparql_query, f"http://localhost:3030/{category}/query")
+    results = select_from_dataset(sparql_query, category)
     bindings = results.get("results", {}).get("bindings", [])
     item_list = []
     for item in bindings:

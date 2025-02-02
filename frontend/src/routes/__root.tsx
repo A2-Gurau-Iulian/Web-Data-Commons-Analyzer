@@ -7,7 +7,6 @@ export const Route = createRootRoute({
     <>
       <h1>Hello</h1>
       <Outlet /> {/* This renders the child route components */}
-      <TanStackRouterDevtools /> {/* This provides router dev tools for debugging */}
     </>
   ),
 })

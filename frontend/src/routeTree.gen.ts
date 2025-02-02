@@ -176,31 +176,19 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
-<<<<<<< HEAD
     | '/'
     | '/classify/categoryDetails'
     | '/classify/classify'
-    | '/visualize/charts'
-    | '/visualize/records'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/classify/categoryDetails'
-    | '/classify/classify'
-    | '/visualize/charts'
-=======
-    | '/classify'
-    | '/'
     | '/visualize/charts'
     | '/visualize/graphs'
     | '/visualize/records'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/classify'
     | '/'
+    | '/classify/categoryDetails'
+    | '/classify/classify'
     | '/visualize/charts'
     | '/visualize/graphs'
->>>>>>> 15a67b3 (scholarly)
     | '/visualize/records'
   id:
     | '__root__'

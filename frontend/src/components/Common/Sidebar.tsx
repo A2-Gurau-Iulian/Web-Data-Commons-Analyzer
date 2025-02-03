@@ -1,6 +1,5 @@
 import * as React from "react";
-import { Outlet } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
+import { Outlet, Link, useLocation } from "@tanstack/react-router";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,38 +11,49 @@ import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon";
 import IconButton from "@mui/material/IconButton";
 import Popover from "@mui/material/Popover";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 
+// ✅ Import Material UI Icons
+import HomeIcon from "@mui/icons-material/Home";
+import TableChartIcon from "@mui/icons-material/TableChart";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import ShareIcon from "@mui/icons-material/Share";
+import CategoryIcon from "@mui/icons-material/Category";
+import SettingsIcon from "@mui/icons-material/Settings";
+
 const drawerWidth = 200;
 
+// ✅ Sidebar Items with Icons
 const items = [
   {
     text: "Home",
     route: "/",
-    subItems: [],
+    icon: <HomeIcon />,
   },
   {
     text: "Visualize",
+    icon: <BarChartIcon />,
     subItems: [
-      { text: "Records", route: "/visualize/records" },
-      { text: "Charts", route: "/visualize/charts" },
-      { text: "Graphs", route: "/visualize/graphs" },
+      { text: "Records", route: "/visualize/records", icon: <TableChartIcon /> },
+      { text: "Charts", route: "/visualize/charts", icon: <BarChartIcon /> },
+      { text: "Graphs", route: "/visualize/graphs", icon: <ShareIcon /> },
     ],
   },
   {
     text: "Classify",
-    subItems: [
-      { text: "Category", route: "/classify/classify" },
-    ],
+    icon: <CategoryIcon />,
+    subItems: [{ text: "Category", route: "/classify/classify", icon: <CategoryIcon /> }],
   },
 ];
 
 export default function Sidebar() {
   const [isSidebarHidden, setIsSidebarHidden] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const location = useLocation(); // ✅ Get current path
 
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -76,7 +86,7 @@ export default function Sidebar() {
       >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Typography variant="h6" noWrap component="div">
-            Web data commons analyzer
+            Web Data Commons Analyzer
           </Typography>
 
           <Box>
@@ -131,10 +141,25 @@ export default function Sidebar() {
             </Typography>
           </Toolbar>
           <Divider />
-          <List dense> {/* ✅ Reduced spacing in list */}
-            {/* ✅ Home (Styled as a Category but Clickable) */}
+          <List dense>
+            {/* ✅ Home Item - Styled as Active When Selected */}
             <ListItem disablePadding sx={{ marginBottom: "4px" }}>
-              <ListItemButton component={Link} to="/" sx={{ pl: 3, py: "4px" }}>
+              <ListItemButton
+                component={Link}
+                to="/"
+                sx={{
+                  pl: 1,
+                  py: "0px",
+                  backgroundColor: location.pathname === "/" ? "#E3F2FD" : "inherit",
+                  color: location.pathname === "/" ? "#007BFF" : "inherit",
+                  "& .MuiListItemIcon-root": {
+                    color: location.pathname === "/" ? "#007BFF" : "inherit",
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: "30px" }}>
+                  <HomeIcon />
+                </ListItemIcon>
                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", fontSize: "14px" }}>
                   Home
                 </Typography>
@@ -142,11 +167,12 @@ export default function Sidebar() {
             </ListItem>
 
             {items
-              .filter((item) => item.text !== "Home") // Avoid duplicating "Home"
-              .map(({ text, subItems }) => (
+              .filter((item) => item.text !== "Home")
+              .map(({ text, icon, subItems }) => (
                 <React.Fragment key={text}>
                   {/* ❌ Non-clickable Main Category */}
                   <ListItem sx={{ marginBottom: "4px", padding: "4px 8px" }}>
+                    <ListItemIcon sx={{ minWidth: "30px" }}>{icon}</ListItemIcon>
                     <Typography
                       variant="subtitle1"
                       sx={{ fontWeight: "bold", fontSize: "14px" }}
@@ -156,16 +182,35 @@ export default function Sidebar() {
                   </ListItem>
 
                   {/* ✅ Clickable Sub-items */}
-                  {subItems.map(({ text: subText, route: subRoute }) => (
-                    <ListItem key={subText} disablePadding sx={{ pl: 3, py: "2px" }}>
-                      <ListItemButton component={Link} to={subRoute}>
-                        <ListItemText
-                          primary={subText}
-                          primaryTypographyProps={{ fontSize: "13px" }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
+                  {subItems.map(({ text: subText, route: subRoute, icon: subIcon }) => {
+                    const isActive = location.pathname === subRoute; // ✅ Check if current page is active
+
+                    return (
+                      <ListItem key={subText} disablePadding sx={{ pl: 3, py: "2px" }}>
+                        <ListItemButton
+                          component={Link}
+                          to={subRoute}
+                          sx={{
+                            backgroundColor: isActive ? "#E3F2FD" : "inherit",
+                            color: isActive ? "#007BFF" : "inherit",
+                            fontWeight: isActive ? "bold" : "normal",
+                            "& .MuiListItemIcon-root": {
+                              color: isActive ? "#007BFF" : "inherit",
+                            },
+                          }}
+                        >
+                          <ListItemIcon sx={{ minWidth: "30px" }}>{subIcon}</ListItemIcon>
+                          <ListItemText
+                            primary={subText}
+                            primaryTypographyProps={{
+                              fontSize: "13px",
+                              fontWeight: isActive ? "bold" : "normal",
+                            }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  })}
                 </React.Fragment>
               ))}
           </List>

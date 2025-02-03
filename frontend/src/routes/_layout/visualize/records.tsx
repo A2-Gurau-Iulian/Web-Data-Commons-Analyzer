@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import TriplesTable from "@/components/Table/EntriesTable";
 import DatasetSelector from "@/components/Common/DatasetSelector"; // Import the DatasetSelector component
 import React, { useEffect, useState } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export const Route = createFileRoute("/_layout/visualize/records")({
   component: RouteComponent,
@@ -18,6 +19,8 @@ function RouteComponent() {
   const [predicateFilter, setPredicateFilter] = useState("");
   const [objectFilter, setObjectFilter] = useState("");
   const [selectedDatasets, setSelectedDatasets] = useState([]); // Selected datasets
+  const [exportingJsonLd, setExportingJsonLd] = useState(false); // Loading state for JSON-LD
+  const [exportingRdf, setExportingRdf] = useState(false); // Loading state for RDF
 
   // Fetch triples from backend based on user selections
   const fetchTriples = async () => {
@@ -62,7 +65,8 @@ function RouteComponent() {
       alert("Please select at least one dataset before exporting.");
       return;
     }
-  
+
+    setExportingJsonLd(true); // Start loading
     try {
       const datasetParams = selectedDatasets.map((ds) => `datasets=${ds}`).join("&");
       const filterParams = [
@@ -74,40 +78,43 @@ function RouteComponent() {
       ]
         .filter(Boolean)
         .join("&");
-  
+
       const response = await fetch(
         `http://127.0.0.1:8000/visualize/records/export?${datasetParams}&${filterParams}`
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to export JSON-LD data.");
       }
-  
+
       const jsonData = await response.json();
       const dataStr = JSON.stringify(jsonData, null, 2);
       const blob = new Blob([dataStr], { type: "application/ld+json" });
       const url = URL.createObjectURL(blob);
-  
+
       // Create a temporary link element
       const link = document.createElement("a");
       link.href = url;
       link.download = "triples.jsonld";
-  
+
       // Trigger download
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
       console.error("Error exporting JSON-LD:", error);
+    } finally {
+      setExportingJsonLd(false); // Stop loading
     }
   };
-  
+
   const handleExportRDF = async () => {
     if (selectedDatasets.length === 0) {
       alert("Please select at least one dataset before exporting.");
       return;
     }
-  
+
+    setExportingRdf(true); // Start loading
     try {
       const datasetParams = selectedDatasets.map((ds) => `datasets=${ds}`).join("&");
       const filterParams = [
@@ -119,30 +126,32 @@ function RouteComponent() {
       ]
         .filter(Boolean)
         .join("&");
-  
+
       const response = await fetch(
         `http://127.0.0.1:8000/visualize/records/export/rdf?${datasetParams}&${filterParams}`
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to export RDF data.");
       }
-  
+
       const rdfData = await response.text();
       const blob = new Blob([rdfData], { type: "text/turtle" });
       const url = URL.createObjectURL(blob);
-  
+
       // Create a temporary link element
       const link = document.createElement("a");
       link.href = url;
       link.download = "triples.ttl"; // Turtle file extension
-  
+
       // Trigger download
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
       console.error("Error exporting RDF:", error);
+    } finally {
+      setExportingRdf(false); // Stop loading
     }
   };
   
@@ -177,23 +186,23 @@ function RouteComponent() {
         </div>
 
         {/* Data Table - Takes up remaining height and full width */}
-<div style={{ flex: "1", overflow: "auto", display: "flex", flexDirection: "column", width: "100%", minWidth: "0" }}>
-  <TriplesTable
-    triples={triples}
-    count={count}
-    page={page}
-    rowsPerPage={rowsPerPage}
-    onPageChange={handlePageChange}
-    onRowsPerPageChange={handleRowsPerPageChange}
-    sortBy={sortBy}
-    sortDirection={sortDirection}
-    onSort={(field, direction) => {
-      setSortBy(field);
-      setSortDirection(direction);
-      setPage(0);
-    }}
-  />
-</div>
+      <div style={{ flex: "1", overflow: "auto", display: "flex", flexDirection: "column", width: "100%", minWidth: "0" }}>
+        <TriplesTable
+          triples={triples}
+          count={count}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          onSort={(field, direction) => {
+            setSortBy(field);
+            setSortDirection(direction);
+            setPage(0);
+          }}
+        />
+      </div>
 
       </div>
 
@@ -206,38 +215,48 @@ function RouteComponent() {
           
           {/* JSON-LD Export Button */}
           <button
-            onClick={handleExportJSONLD}
-            style={{
-              width: "100%",
-              padding: "0.5rem",
-              backgroundColor: "#007BFF",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "14px",
-              marginBottom: "5px",
-            }}
-          >
-            JSON-LD
-          </button>
+        onClick={handleExportJSONLD}
+        disabled={exportingJsonLd} // Disable button while exporting
+        style={{
+          width: "100%",
+          padding: "0.5rem",
+          backgroundColor: exportingJsonLd ? "#5a9bdf" : "#007BFF",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: exportingJsonLd ? "not-allowed" : "pointer",
+          fontSize: "14px",
+          marginBottom: "5px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "10px",
+        }}
+      >
+        {exportingJsonLd ? <CircularProgress size={20} style={{ color: "white" }} /> : "JSON-LD"}
+      </button>
 
           {/* RDF Export Button */}
           <button
-            onClick={handleExportRDF}
-            style={{
-              width: "100%",
-              padding: "0.5rem",
-              backgroundColor: "#28A745", // Green color
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "14px",
-            }}
-          >
-            RDF (Turtle)
-          </button>
+        onClick={handleExportRDF}
+        disabled={exportingRdf} // Disable while exporting
+        style={{
+          width: "100%",
+          padding: "0.5rem",
+          backgroundColor: exportingRdf ? "#4a9f65" : "#28A745",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: exportingRdf ? "not-allowed" : "pointer",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "10px",
+        }}
+      >
+        {exportingRdf ? <CircularProgress size={20} style={{ color: "white" }} /> : "RDF (Turtle)"}
+      </button>
         </div>
       </div>
     </div>

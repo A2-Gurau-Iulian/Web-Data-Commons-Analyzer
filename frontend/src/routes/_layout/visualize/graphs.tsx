@@ -12,8 +12,8 @@ function GraphPage() {
     nodes: [],
     links: [],
   });
-  const [selectedDatasets, setSelectedDatasets] = useState([]); // Selected datasets
-  const [search, setSearch] = useState(""); // Search term
+  const [selectedDatasets, setSelectedDatasets] = useState([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -24,7 +24,7 @@ function GraphPage() {
     }
 
     setLoading(true);
-    setError(null); // Reset previous errors
+    setError(null);
     try {
       const datasetParams = selectedDatasets.map((ds) => `datasets=${ds}`).join("&");
       const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";

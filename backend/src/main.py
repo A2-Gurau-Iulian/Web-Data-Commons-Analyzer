@@ -140,7 +140,39 @@ def get_available_datasets():
         "creativework",
         "dataset",
         "educationalorganization",
-
+        "event",
+        "geocoordinates",
+        "governmentorganization",
+        "hospital",
+        "hotel",
+        "jobposting",
+        "lakebodyofwater",
+        "landmarksorhistoricalbuildings",
+        "language",
+        "library",
+        "localbusiness",
+        "mountain",
+        "movie",
+        "museum",
+        "musicalbum",
+        "musicalbumrecording",
+        "painting",
+        "park",
+        "place",
+        "product",
+        "question",
+        "radiostation",
+        "recipe",
+        "restaurant",
+        "riverbodyofwater",
+        "school",
+        "shoppingcenter",
+        "skiresort",
+        "sportsevent",
+        "sportsteam",
+        "stadiumorarena",
+        "televisionstation",
+        "tvepisode"
     ]
     return {"datasets": datasets}
 
@@ -449,3 +481,87 @@ async def sparql_select(category: str):
         item_list += item["id"]["value"],
 
     return {"ids": item_list}
+
+@app.get("/visualize/stats")
+def get_visualization_stats(datasets: list = Query(..., description="List of datasets to include")):
+    """
+    Fetch various statistics like total records, unique subjects, predicates, objects, etc.
+    """
+    if not datasets:
+        return {"error": "At least one dataset must be specified."}
+
+    # Query to get total records
+    total_records_query = f"""
+    SELECT (COUNT(*) AS ?count) 
+    WHERE {{
+      ?subject ?predicate ?object.
+    }}
+    """
+    
+    # Query to get unique subjects, predicates, objects
+    unique_subjects_query = f"""
+    SELECT (COUNT(DISTINCT ?subject) AS ?count) 
+    WHERE {{
+      ?subject ?predicate ?object.
+    }}
+    """
+
+    unique_predicates_query = f"""
+    SELECT (COUNT(DISTINCT ?predicate) AS ?count) 
+    WHERE {{
+      ?subject ?predicate ?object.
+    }}
+    """
+
+    unique_objects_query = f"""
+    SELECT (COUNT(DISTINCT ?object) AS ?count) 
+    WHERE {{
+      ?subject ?predicate ?object.
+    }}
+    """
+
+    most_connected_subject_query = f"""
+            SELECT (MAX(?count) AS ?maxCount)
+            WHERE {{ 
+                SELECT ?s (COUNT(?p) AS ?count)
+                WHERE {{ ?s ?p ?o }}
+                GROUP BY ?s
+            }}
+    """
+
+    total_records = 0
+    unique_subjects = 0
+    unique_predicates = 0
+    unique_objects = 0
+    most_connected_subject = 0
+
+    # Execute Queries
+    total_records_results = execute_select_query(total_records_query, datasets)
+    unique_subjects_results = execute_select_query(unique_subjects_query, datasets)
+    unique_predicates_results = execute_select_query(unique_predicates_query, datasets)
+    unique_objects_results = execute_select_query(unique_objects_query, datasets)
+    most_connected_subject_results = execute_select_query(most_connected_subject_query, datasets)
+
+    for result in total_records_results:
+        total_records += int(result["results"]["bindings"][0]["count"]["value"])
+
+    for result in unique_subjects_results:
+        unique_subjects += int(result["results"]["bindings"][0]["count"]["value"])
+
+    for result in unique_predicates_results:
+        unique_predicates += int(result["results"]["bindings"][0]["count"]["value"])
+
+    for result in unique_objects_results:
+        unique_objects += int(result["results"]["bindings"][0]["count"]["value"])
+
+    for result in most_connected_subject_results:
+        most_connected_subject = max(most_connected_subject, int(result["results"]["bindings"][0]["maxCount"]["value"]))
+
+    return {
+        "totalRecords": total_records,
+        "uniqueSubjects": unique_subjects,
+        "uniquePredicates": unique_predicates,
+        "uniqueObjects": unique_objects,
+        "datasetCount": len(datasets),
+        "mostConnectedSubject" : most_connected_subject 
+    }

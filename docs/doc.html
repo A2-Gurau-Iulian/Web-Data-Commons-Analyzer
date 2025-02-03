@@ -193,9 +193,13 @@
     <section id="implementation-constraints" role="doc-introduction">
       <h3>3.4 Design and Implementation Constraints</h3>
       <p>
-        The projects represents a web application. The interface was made using React, (TODO FLORIN)
-        The backend of the application is made using the Python and the FastAPI framework (TODO FLORIN). We used Apache Jena Fuseki as our RDF datastore.
         In the requirements for implementing this application the choice of frontend and backend frameworks was free. 
+        The interface was made using React and MUI (Material UI) components for styling and layout. 
+        The application structure follows a modular approach, utilizing TanStack Router for client-side routing and state management through React Hooks.
+        
+        
+        The backend of the application was developed using Python and the FastAPI framework, providing efficient handling of API requests and responses. 
+        The RDF data is stored and queried using Apache Jena Fuseki, a SPARQL-compliant triplestore that allows for structured queries and reasoning over RDF datasets.
       </p>
     </section>
     <section id="assumptions-dependencies" role="doc-introduction">
@@ -222,7 +226,7 @@
         helps the user navigate to the page he or she is interested in. This can be turned off at any time by clicking on the settings icon in the top right corner.
       </p>
       <p>
-        On the home page... (TODO : FLORIN)
+        On the home page a short summary can be found about what our system is made for and what functionalities it does provide.
       </p>
       <p>
         Through the Records page the user can search and filter
@@ -259,7 +263,7 @@
       <h3>4.3 Software Interfaces</h3>
       <p>
         A web browser is required to access the application since the data is
-        accessed via HTTP requests. The application stores the data in a Oracle database. (TODO : FLORIN)
+        accessed via HTTP requests. The application stores the data in a Apache Jena Fuseki datastore.
       </p>
     </section>
   </section>
@@ -269,7 +273,8 @@
     <section id="searching" role="doc-introduction">
       <h3>5.1 Visualize metadata as it is provided by <a href="https://webdatacommons.org/">Web Data Commons</a></h3>
       <p>
-        TODO FLORIN
+        Users can view the data in a tabular format. They can filter the data based on the object, subject and predicate propeties as well as sort it. 
+        Filtering by dataset is also possible using by checking cheboxes in the right side list.
       </p>
     </section>
     <section id="filtering" role="doc-introduction">
@@ -277,11 +282,17 @@
         5.2 View various statistics and configurable charts about the data
       </h3>
       <p>
+        Users can view charts by a few different presets. The types of charts presented are : pie, bar and treemap. And there are some configurable clauses to view data by.
+        They can see the "count of" by subject, predicate or object, the "Subjects with the Most Unique Objects", the "Top Subjects With Most Relations", 
+        "Top Objects with Most Mentions", "Top Predicate-Object Pairs".
+        On the pie chart, entries can be disabled by pressing on their respective icon in the legend.
       </p>
     </section>
     <section id="account-making" role="doc-introduction">
       <h3>5.3 Graph the RDF data</h3>
       <p>
+        On the graphs page users can see a graph visualisation of the RDF data. They can filter the data by entering a keyword in the search bar, 
+        and see the graph that contains only links to filtered nodes. The user can pan around the graph and pull its nodes however they want.
       </p>
     </section>
     <section id="viewing-stats" role="doc-introduction">
@@ -330,6 +341,21 @@
           href="https://github.com/rick4470/IEEE-SRS-Tempate#readme">https://github.com/rick4470/IEEE-SRS-Tempate#readme</a>
       </li>
       <li>
+        FastAPI :
+        <a
+          href="https://fastapi.tiangolo.com/">https://fastapi.tiangolo.com/</a>
+      </li>
+      <li>
+        React :
+        <a
+          href="https://react.dev/learn">https://react.dev/learn</a>
+      </li>
+      <li>
+        TanStack :
+        <a
+          href="https://tanstack.com/query/v5/docs/framework/react/overview">https://tanstack.com/query/v5/docs/framework/react/overview</a>
+      </li>
+      <li>
         The C4 model for visualising software :
         <a
           href="https://c4model.com/">https://c4model.com/</a>
@@ -339,7 +365,6 @@
         <a
           href="https://jena.apache.org/documentation/fuseki2/">https://jena.apache.org/documentation/fuseki2/</a>
       </li>
-      (TODO : FLORIN)
     </ul>
   </section>
 </body>

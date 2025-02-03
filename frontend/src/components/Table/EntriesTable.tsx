@@ -63,14 +63,35 @@ export default function TriplesTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {triples.map((triple, index) => (
-            <TableRow key={index}>
-              <TableCell>{triple.subject}</TableCell>
-              <TableCell>{triple.predicate}</TableCell>
-              <TableCell>{triple.object}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
+  {triples.map((triple, index) => (
+    <TableRow key={index}>
+      <TableCell style={{ 
+        maxWidth: "200px", 
+        wordBreak: "break-word", 
+        whiteSpace: "normal", 
+        overflowWrap: "break-word" 
+      }}>
+        {triple.subject}
+      </TableCell>
+      <TableCell style={{ 
+        maxWidth: "200px", 
+        wordBreak: "break-word", 
+        whiteSpace: "normal", 
+        overflowWrap: "break-word" 
+      }}>
+        {triple.predicate}
+      </TableCell>
+      <TableCell style={{ 
+        maxWidth: "200px", 
+        wordBreak: "break-word", 
+        whiteSpace: "normal", 
+        overflowWrap: "break-word" 
+      }}>
+        {triple.object}
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
       </Table>
       <TablePagination
         rowsPerPageOptions={[10, 25, 50]}
